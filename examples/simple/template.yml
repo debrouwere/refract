@@ -1,0 +1,6 @@
+total: subtotal + tax
+title: titleize order
+string: just a plain old string
+tags:
+    names: pluck tags, 'name'
+    list: (pluck tags, 'name').join ', '
