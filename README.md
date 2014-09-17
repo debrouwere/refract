@@ -13,8 +13,8 @@ Refract is a command-line utility to reshape objects to a template.
 // template
 {
     "id": "parseInt id", 
-    "uid": "dasherize customer"
-    "tax": "subtotal * 0.21"
+    "uid": "dasherize customer", 
+    "tax": "subtotal * 0.21", 
     "total": "handling + subtotal * 1.21"
 }
 // result
@@ -22,7 +22,7 @@ Refract is a command-line utility to reshape objects to a template.
     "id": 5768, 
     "uid": "stijn-debrouwere", 
     "tax": 42, 
-    "total": 252, 
+    "total": 252
 }
 ```
 
