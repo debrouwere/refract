@@ -3,10 +3,17 @@
   "version": "0.1.0",
   "description": "A command-line utility to reshape objects. Destructuring assignment on steroids.",
   "main": "lib/index.js",
+  "bin": {
+    "refract": "bin/refract"
+  }, 
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test"
   },
   "author": "Stijn Debrouwere",
+  "repository": {
+    "type" : "git", 
+    "url" : "http://github.com/stdbrouw/refract.git"
+  },   
   "license": "ISC",
   "dependencies": {
     "coffee-script": "^1.8.0",
