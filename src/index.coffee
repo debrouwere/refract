@@ -1,7 +1,6 @@
 evaluate = (require 'coffee-script').eval
 _ = require 'underscore'
 _.str = require 'underscore.string'
-_.str.identity = _.identity
 
 
 string = (value) ->
@@ -18,17 +17,13 @@ requote = (value) ->
         value
 
 
-module.exports = (template, context, options={}) ->
-    _.defaults options, 
-        normalize: 'identity'
-
+module.exports = (template, context) ->
     refract = _.partial module.exports, _, context
-    normalize = _.str[options.normalize]
 
     switch template.constructor
         when Object
             _.object _.map template, (value, key) ->
-                [(normalize key), (refract value)]
+                [key, refract value]
         when Array
             _.map template, refract
         else

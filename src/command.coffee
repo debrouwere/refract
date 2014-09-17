@@ -2,6 +2,7 @@ fs = require 'fs'
 fs.path = require 'path'
 _ = require 'underscore'
 _.str = require 'underscore.string'
+_.str.identity = _.identity
 yaml = require 'js-yaml'
 program = require 'commander'
 refract = require './'
@@ -17,6 +18,8 @@ program
         'Add in additional JavaScript helper functions.'
     .option '-i --in-place', 
         'Modify the file that contains the original object.'
+    .option '-n --normalize [style]', 
+        'Normalize field names to a standard style.'
     .option '-p --pretty', 
         'Output pretty indented JSON.'
     .parse process.argv
@@ -35,6 +38,14 @@ if program.helpers
 
 helpers = _.extend {}, additionalHelpers, refract.builtinHelpers
 
+normalizeString = _.str[program.normalize or 'identity']
+normalize = (obj) ->
+    if obj.constructor is Object
+        _.object _.map obj, (value, key) ->
+            [(normalizeString key), (normalize value)]
+    else
+        obj
+
 refractTemplate = _.partial refract, template
 
 if program.each
@@ -50,8 +61,9 @@ if program.defaults
 else if program.add
     refraction = _.extend object, refraction
 
+normalizedRefraction = normalize refraction
 indentation = if program.pretty then 4
-serialization = JSON.stringify refraction, undefined, indentation
+serialization = JSON.stringify normalizedRefraction, undefined, indentation
 
 if program.inPlace
     if not inputPath then throw new Error "Cannot edit in-place on stdin."
