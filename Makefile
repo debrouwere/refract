@@ -1,6 +1,7 @@
 all: build
 
-build: coffee --output lib --compile src
+build:
+	coffee --output lib --compile src
 
 .PHONY: test
 test: build
