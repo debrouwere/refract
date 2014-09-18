@@ -1,5 +1,7 @@
 # Refract
 
+[![Build Status](https://travis-ci.org/stdbrouw/refract.svg)](https://travis-ci.org/stdbrouw/refract)
+
 Refract is a command-line utility to reshape objects to a template.
 
 ```javascript
@@ -28,49 +30,108 @@ Refract is a command-line utility to reshape objects to a template.
 
 Think of it as destructuring assignment on steroids.
 
-### Status
+## Installation
 
-Mostly works, but needs some polish and some testing.
+Install `refract` using the [NPM](https://www.npmjs.org/) package manager which comes bundled with [node.js](http://nodejs.org/).
 
-### Usage
+```shell
+npm install refract-cli -g
+```
 
-Refract takes a template object and a data object.
+This will make the `refract` command globally available on your system. You can also use the `refract-cli` module in node.js, as detailed below.
 
-...
+## Usage
 
-By default, only the evaluated fields from the template object will be included in the output. Specify `--add` if you would like to merge this output with the original object. If the template should only be used to fill in missing values, instead use `--defaults`.
+Refract takes data and modifies it according to a template.
 
-Refract prints to `stdout`. If you'd like to modify the original JSON file instead, use `--in-place`. For obvious reasons, this only works if a file was specified on the command line rather than piped in over `stdin`.
+Templates are JSON or YAML objects containing keys and expressions. Each expression will be evaluated and the resulting object will be returned.
 
-Refract can also iterate over an array of objects. Use the `--each` option.
+Refract accepts a path to a YAML or JSON template file (using `--template`), a template string (using `--string`) or a list of mapping functions (using `--apply`).
 
-### Expressions
+`--string` and `--apply` are convenient for quick refractions, where you don't want to bother with having a refraction template on disk.
 
-Refract will evaluate every value in the template object as [CoffeeScript](http://coffeescript.org/) code, or if that fails, as a string with [string interpolation](http://coffeescript.org/#strings).
+### --template
 
-Renaming: 
+```shell
+refract order.json --template template.json
+```
+
+### --string
+
+With `--string`, you pass the actual template as a string of YAML of JSON instead of a path to a template file.
+
+```shell
+refract order.json --string 'total: subtotal + tax'
+```
+
+```json
+{
+    "total": ..., 
+}
+```
+
+### --apply
+
+Use `--apply` to apply a helper function to a field. The helper function will receive the current value of the field as its only argument.
+
+```shell
+refract order.json --apply total:parseInt,title:titleize
+```
+
+Mapping fields with `--apply` is considerably less flexible than using templates, but when all you need to do is clean up or modify a couple of fields in a straightforward way, it does the trick.
+
+Use `--update` to keep fields that were not transformed in the output.
+
+## Expressions
+
+Refract will evaluate every value in the template object as [CoffeeScript](http://coffeescript.org/) code, or if that fails, as a string with [string interpolation](http://coffeescript.org/#strings). Every expression is then replaced with its result.
+
+Variables: 
 
 ```coffeescript
+book.author
 ```
 
 Math: 
 
 ```coffeescript
+handling + subtotal * 1.21
 ```
 
-Interpolation: 
+String interpolation: 
 
 ```coffeescript
+Dr. #{name.first} #{name.last}
 ```
 
 Plain strings: 
 
 ```coffeescript
+Hello world.
+```
+
+Explicit strings:
+
+```coffeescript
+'Hello world.'
 ```
 
 Arrays:
 
 ```coffeescript
+[1, 2, 3]
+```
+
+Methods:
+
+```coffeescript
+participants.join ', '
+```
+
+Functions:
+
+```coffeescript
+titleize permalink
 ```
 
 Because, in this limited environment, almost all valid JavaScript is also valid CoffeeScript, you can  get away with just writing expressions in JavaScript if you'd prefer: 
@@ -84,15 +145,9 @@ Because, in this limited environment, almost all valid JavaScript is also valid 
 }
 ```
 
-### Helpers
+## Helpers
 
 Available context includes the object itself as well as numerous helper functions loaned from [underscore](http://underscorejs.org/) and [underscore.string](https://github.com/epeli/underscore.string). Please take a look at their documentation to find out which helper functions are available to you.
-
-You can add your own helper functions. This should be a regular `.js` or `.coffee` file that can be `require`'d in node.
-
-```shell
-...
-```
 
 Because the keys of your data object can sometimes override helpers (for example, you might have a `where` key that clashes with underscore's `where` function), underscore functions are also available under the `_` namespace, underscore.string functions under the `_.str` namespace.
 
@@ -110,6 +165,20 @@ Because the keys of your data object can sometimes override helpers (for example
 }
 ```
 
+## Additional features
+
+### Merging the refraction with the original object
+
+By default, only the evaluated fields from the template object will be included in the output. Specify `--update` if you would like to merge this output with the original object. If the template should only be used to fill in missing values, instead use `--missing`.
+
+### Editing JSON in-place
+
+Refract prints to `stdout`. If you'd like to modify the original JSON file instead, use `--in-place`. For obvious reasons, this only works if a file was specified on the command line rather than piped in over `stdin`.
+
+### Iterating over multiple objects
+
+Refract can also iterate over an array of objects. Use the `--each` option.
+
 ### Normalizing keys
 
 Renaming the fields of an object is easy: 
@@ -125,7 +194,7 @@ Renaming the fields of an object is easy:
 }
 ```
 
-However, if you'd like _all_ fields of an object to adhere to the same standard, this can get tiresome really fast. The `--normalize` option provides a handy shortcut. You can normalize key names using any [underscore.string](https://github.com/epeli/underscore.string) function, e.g. `--normalize underscored`. The most useful ones are probably: 
+However, if you'd like _all_ fields of an object to adhere to the same standard, this field-per-field approach gets cumbersome really fast. The `--normalize` option provides a handy shortcut. You can normalize key names using any [underscore.string](https://github.com/epeli/underscore.string) function, e.g. `--normalize underscored`. The most useful ones are probably: 
 
 * titleize
 * camelize
@@ -134,10 +203,52 @@ However, if you'd like _all_ fields of an object to adhere to the same standard,
 * humanize
 * slugify
 
-### Usage from node.js
+### Custom helper functions
 
-...
+You can add your own helper functions. This should be a regular `.js` or `.coffee` file that can be `require`'d in node.
 
-### Roadmap
+For example, your `helpers.js` might look like:
+
+```javascript
+exports.toCelcius = function (fahrenheit) {
+    return (fahrenheit - 32) * 5 / 9;
+}
+```
+
+And then you can use that helper with
+
+```shell
+refract data.json \
+    --apply temperature:toCelcius \
+    --helpers helpers.js
+```
+
+## Usage from node.js
+
+```javascript
+var refract = require('refract-cli');
+
+var obj = {
+    count: '137'
+}
+var template = {
+    count: 'parseInt count'
+}
+
+// refract with only JavaScript builtin functions
+// like `parseInt` and `Math.max` as helpers
+var newObj = refract(template, obj);
+
+// include underscore and underscore.string
+// as helpers
+var _ = require('underscore');
+var context = _.extend({}, obj, refract.defaultHelpers)
+var newObj = refract(template, context);
+
+// keep original fields too, not just refracted ones
+_.extend(newObj, obj);
+```
+
+## Roadmap
 
 It would be kind of cool if `refract` supported CSV input, converting header names into variables, and then back into (new) headers and columns on output. Maybe someday.
