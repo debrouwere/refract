@@ -21,5 +21,9 @@
     "js-yaml": "^3.2.2",
     "underscore": "^1.7.0",
     "underscore.string": "^2.3.3"
+  }, 
+  "devDependencies": {
+    "should": "4.x", 
+    "mocha": "1.x"
   }
 }

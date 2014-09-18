@@ -1,8 +1,7 @@
 all:
 	coffee --output lib --compile src
 
+.PHONY: test
 test:
-	./bin/refract examples/simple/template.yml examples/simple/object.json \
-		--normalize capitalize \
-		--pretty \
-		--add
+	mocha test --require should --compilers coffee:coffee-script/register
+	
