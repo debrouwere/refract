@@ -2,9 +2,11 @@ evaluate = (require 'coffee-script').eval
 _ = require 'underscore'
 _.str = require 'underscore.string'
 
-
 string = (value) ->
     '"' + value + '"'
+
+interpolate = (value, options) ->
+    evaluate (string value), options
 
 # single quotes are not interpolated in CoffeeScript, but 
 # in a JSON file, "'an #{adjective} string'" looks much nicer 
@@ -31,7 +33,7 @@ module.exports = (template, context) ->
             try
                 evaluate value, sandbox: context
             catch err
-                evaluate (string value), sandbox: context
+                interpolate value, sandbox: context
 
 
-module.exports.builtinHelpers = _.extend {}, _, _.str
+module.exports.defaultHelpers = _.extend {}, _, _.str

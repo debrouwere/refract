@@ -8,35 +8,51 @@ program = require 'commander'
 refract = require './'
 
 program
-    .option '-a --add', 
+    .option '-t --template <path>', 
+        'Path to a template file.'
+    .option '-s --string <template>', 
+        'A template string.'
+    .option '-a --apply <mapping>', 
+        'A mapping that specifies which function to apply to which field.'
+    .option '-u --update', 
         'Add refracted fields to the original object.'
-    .option '-d --defaults', 
+    .option '-m --missing', 
         'Only refract a field if it is not present in the original object.'
-    .option '-e --each [key]', 
+    .option '-e --each', 
         'Refract each element in an array.'
     .option '-H --helpers', 
         'Add in additional JavaScript helper functions.'
     .option '-i --in-place', 
         'Modify the file that contains the original object.'
-    .option '-n --normalize [style]', 
+    .option '-n --normalize <style>', 
         'Normalize field names to a standard style.'
     .option '-p --pretty', 
         'Output pretty indented JSON.'
     .parse process.argv
 
-[templatePath, inputPath] = program.args
+inputPath = program.args[0]
 
 inputLocation = inputPath or '/dev/stdin'
 rawInput = fs.readFileSync (fs.path.resolve inputLocation), encoding: 'utf8'
 object = yaml.safeLoad rawInput
 
-rawTemplate = fs.readFileSync (fs.path.resolve templatePath), encoding: 'utf8'
-template = yaml.safeLoad rawTemplate
+if program.template
+    rawTemplate = fs.readFileSync (fs.path.resolve program.template), encoding: 'utf8'
+    template = yaml.safeLoad rawTemplate
+else if program.string
+    template = yaml.safeLoad program.string
+else if program.apply
+    template = _.object program.apply
+        .split ','
+        .map (instruction) ->
+            instruction.split ':'
+else
+    throw new Error "Specify a --template, --string string or --apply mapping."
 
 if program.helpers
     additionalHelpers = require fs.path.resolve program.helpers
 
-helpers = _.extend {}, additionalHelpers, refract.builtinHelpers
+helpers = _.extend {}, additionalHelpers, refract.defaultHelpers
 
 normalizeString = _.str[program.normalize or 'identity']
 normalize = (obj) ->
@@ -56,9 +72,9 @@ else
     context = _.extend {}, object, helpers
     refraction = refractTemplate context
 
-if program.defaults
+if program.missing
     refraction = _.defaults object, refraction
-else if program.add
+else if program.update
     refraction = _.extend object, refraction
 
 normalizedRefraction = normalize refraction
