@@ -50,6 +50,7 @@ else
     throw new Error "Specify a --template, --string string or --apply mapping."
 
 if program.helpers
+    require 'coffee-script/register'
     additionalHelpers = require fs.path.resolve program.helpers
 
 helpers = _.extend {}, additionalHelpers, refract.defaultHelpers
