@@ -249,6 +249,7 @@ var newObj = refract(template, context);
 _.extend(newObj, obj);
 ```
 
-## Roadmap
+## Future
 
-It would be kind of cool if `refract` supported CSV input, converting header names into variables, and then back into (new) headers and columns on output. Maybe someday.
+* It would be kind of cool if `refract` supported CSV input, converting header names into variables, and then back into (new) headers and columns on output. Maybe someday.
+* It might be useful to support not just JavaScript functions as helpers, but also shell commands. (It wouldn't be terribly efficient, because you'd have to have a bunch of child processes running to manage this, but that's another matter.)
