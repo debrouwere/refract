@@ -25,9 +25,9 @@ program
     .option '-i --in-place', 
         'Modify the file that contains the original object.'
     .option '-n --normalize <style>', 
-        'Normalize field names to a standard style.'
-    .option '-p --pretty', 
-        'Output pretty indented JSON.'
+        'Normalize field names to a standard style.', 'underscored'
+    .option '-I --indent [n]', 
+        'Output pretty indented JSON.', 2
     .parse process.argv
 
 inputPath = program.args[0]
@@ -79,8 +79,7 @@ else if program.update
     refraction = _.extend object, refraction
 
 normalizedRefraction = normalize refraction
-indentation = if program.pretty then 4
-serialization = JSON.stringify normalizedRefraction, undefined, indentation
+serialization = JSON.stringify normalizedRefraction, undefined, program.indent
 
 if program.inPlace
     if not inputPath then throw new Error "Cannot edit in-place on stdin."
