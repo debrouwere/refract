@@ -38,8 +38,12 @@ if program.new
 else
     inputPath = program.args[0]
     inputLocation = inputPath or '/dev/stdin'
+    if (fs.path.extname inputLocation) is '.json'
+        parse = JSON.parse
+    else
+        parse = yaml.safeLoad
     rawInput = fs.readFileSync (fs.path.resolve inputLocation), encoding: 'utf8'
-    objects = yaml.safeLoad rawInput
+    objects = parse rawInput
 
 unless program.each
     objects = [objects]
