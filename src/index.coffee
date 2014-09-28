@@ -45,7 +45,7 @@ module.exports = (template, context, update) ->
     refract = _.partial module.exports, _, context
     update ?= _.partial updateAt, context
 
-    switch template.constructor
+    switch template?.constructor
         when Object
             _.object _.map template, (value, key) ->
                 updateHere = _.partial update, key
