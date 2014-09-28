@@ -21,7 +21,7 @@ program
         'Only refract a field if it is not present in the original object.'
     .option '-e --each', 
         'Refract each element in an array.'
-    .option '-H --helpers', 
+    .option '-H --helpers <path>', 
         'Add in additional JavaScript helper functions.'
     .option '-i --in-place', 
         'Modify the file that contains the original object.'
@@ -59,9 +59,12 @@ if program.helpers
 
 helpers = _.extend {}, additionalHelpers, refract.defaultHelpers
 
-normalizer = _.str[program.normalized or 'identity']
-normalize = _.partial utils.applyToKeys, _, normalizer
-normalizedObjects = _.map objects, normalize
+if program.normalized
+    normalizer = _.str[program.normalized or 'identity']
+    normalize = _.partial utils.applyToKeys, _, normalizer
+    normalizedObjects = _.map objects, normalize
+else
+    normalizedObjects = objects
 
 refractions = _.map normalizedObjects, (item) ->
     context = _.extend {}, item, helpers
