@@ -27,7 +27,6 @@ updateAt = (obj, segments..., key, value) ->
     for segment in segments
         obj = obj[segment] ?= {}
 
-    #console.log 'update', segments, key, value
     _.extend obj, (kv key, value)
 
 module.exports = (template, context, update) ->
