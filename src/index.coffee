@@ -25,8 +25,6 @@ characters of the expressions.
 ###
 
 requote = (value) ->
-    return value unless typeof value is 'string'
-
     quoted = value.match /^'.*'$/
     slashes = value.match /^\/.*\/$/
 
@@ -55,7 +53,7 @@ module.exports = (template, context, update) ->
                 [key, refracted]
         when Array
             _.map template, refract
-        else
+        when String
             value = requote template
             try
                 refracted = evaluate value, sandbox: context
@@ -64,6 +62,8 @@ module.exports = (template, context, update) ->
             
             update refracted
             refracted
+        else
+            template
 
 
 module.exports.defaultHelpers = _.extend {}, _, _.str
