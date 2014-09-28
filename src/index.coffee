@@ -25,6 +25,8 @@ characters of the expressions.
 ###
 
 requote = (value) ->
+    return value unless typeof value is 'string'
+
     quoted = value.match /^'.*'$/
     slashes = value.match /^\/.*\/$/
 
