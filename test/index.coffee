@@ -34,11 +34,12 @@ describe 'refract: command-line interface', ->
         original = JSON.parse fs.readFileSync path, encoding: 'utf8'
         command = "./bin/refract #{path} \
             --template examples/simple/template.yml \
-            --normalize capitalize \
+            --normalized slugify \
             --update \
             --pretty"
         exec command, (err, stdout, stderr) ->
             stdout.should.be.an.instanceOf String
             refracted = JSON.parse stdout
-            refracted.Total.should.eql original.subtotal + original.tax
+            refracted.calculated.total.should.eql original.Subtotal + original.Tax
+            refracted.calculated.profit.should.eql refracted.calculated.total * 0.1
             done err

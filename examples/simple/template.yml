@@ -1,4 +1,6 @@
-total: subtotal + tax
+calculated:
+    total: subtotal + tax
+    profit: calculated.total * 0.1
 title: titleize order
 string: just a plain old string
 tags:

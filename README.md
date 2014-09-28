@@ -17,7 +17,7 @@ Refract is a command-line utility to reshape objects to a template.
     "id": "parseInt id", 
     "uid": "dasherize customer", 
     "tax": "subtotal * 0.21", 
-    "total": "handling + subtotal * 1.21"
+    "total": "subtotal + handling + tax"
 }
 // result
 {
@@ -202,6 +202,8 @@ However, if you'd like _all_ fields of an object to adhere to the same standard,
 * dasherize
 * humanize
 * slugify
+
+Normalization happens before refraction, so refraction expressions should refer to variables by their new normalized names, not their original ones.
 
 ### Custom helper functions
 

@@ -6,6 +6,7 @@ _.str.identity = _.identity
 yaml = require 'js-yaml'
 program = require 'commander'
 refract = require './'
+utils = require './utils'
 
 program
     .option '-t --template <path>', 
@@ -24,10 +25,10 @@ program
         'Add in additional JavaScript helper functions.'
     .option '-i --in-place', 
         'Modify the file that contains the original object.'
-    .option '-n --normalize <style>', 
+    .option '-n --normalized <style>', 
         'Normalize field names to a standard style.', 'underscored'
     .option '-I --indent [n]', 
-        'Output pretty indented JSON.', 2
+        'Output pretty indented JSON.', parseInt, 2
     .parse process.argv
 
 inputPath = program.args[0]
@@ -55,31 +56,25 @@ if program.helpers
 
 helpers = _.extend {}, additionalHelpers, refract.defaultHelpers
 
-normalizeString = _.str[program.normalize or 'identity']
-normalize = (obj) ->
-    if obj.constructor is Object
-        _.object _.map obj, (value, key) ->
-            [(normalizeString key), (normalize value)]
-    else
-        obj
+normalizer = _.str[program.normalized or 'identity']
+normalizedObject = utils.applyToKeys object, normalizer
 
 refractTemplate = _.partial refract, template
 
 if program.each
-    refraction = _.map object, (item) ->
+    refraction = _.map normalizedObject, (item) ->
         context = _.extend {}, item, helpers
         refractTemplate context
 else
-    context = _.extend {}, object, helpers
+    context = _.extend {}, normalizedObject, helpers
     refraction = refractTemplate context
 
 if program.missing
-    refraction = _.defaults object, refraction
+    refraction = _.defaults normalizedObject, refraction
 else if program.update
-    refraction = _.extend object, refraction
+    refraction = _.extend normalizedObject, refraction
 
-normalizedRefraction = normalize refraction
-serialization = JSON.stringify normalizedRefraction, undefined, program.indent
+serialization = JSON.stringify refraction, undefined, program.indent
 
 if program.inPlace
     if not inputPath then throw new Error "Cannot edit in-place on stdin."

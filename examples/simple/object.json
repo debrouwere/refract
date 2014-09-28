@@ -1,9 +1,9 @@
 {
-    "order": "authentic-silver-cutlery", 
-    "subtotal": 500, 
-    "tax": 100, 
-    "tags": [
-        {"name": "silverware"}, 
-        {"name": "cutlery"}
+    "Order": "authentic-silver-cutlery", 
+    "Subtotal": 500, 
+    "Tax": 100, 
+    "Tags": [
+        {"Name": "silverware"}, 
+        {"Name": "cutlery"}
         ]
 }

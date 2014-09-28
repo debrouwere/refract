@@ -17,7 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "coffee-script": "^1.8.0",
-    "commander": "^2.3.0",
+    "commander": "2.1.x",
     "js-yaml": "^3.2.2",
     "underscore": "^1.7.0",
     "underscore.string": "^2.3.3"

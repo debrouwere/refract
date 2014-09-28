@@ -18,22 +18,39 @@ requote = (value) ->
     else
         value
 
+kv = (key, value) ->
+    obj = {}
+    obj[key] = value
+    obj
 
-module.exports = (template, context) ->
+updateAt = (obj, segments..., key, value) ->
+    for segment in segments
+        obj = obj[segment] ?= {}
+
+    #console.log 'update', segments, key, value
+    _.extend obj, (kv key, value)
+
+module.exports = (template, context, update) ->
     refract = _.partial module.exports, _, context
+    update ?= _.partial updateAt, context
 
     switch template.constructor
         when Object
             _.object _.map template, (value, key) ->
-                [key, refract value]
+                updateHere = _.partial update, key
+                refracted = refract value, updateHere
+                [key, refracted]
         when Array
             _.map template, refract
         else
             value = requote template
             try
-                evaluate value, sandbox: context
+                refracted = evaluate value, sandbox: context
             catch err
-                interpolate value, sandbox: context
+                refracted = interpolate value, sandbox: context
+            
+            update refracted
+            refracted
 
 
 module.exports.defaultHelpers = _.extend {}, _, _.str
