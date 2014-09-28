@@ -23,6 +23,8 @@ program
         'Refract each element in an array.'
     .option '-H --helpers <path>', 
         'Add in additional JavaScript helper functions.'
+    .option '-N, --new', 
+        'Refract an empty object.'
     .option '-i --in-place', 
         'Modify the file that contains the original object.'
     .option '-n --normalized <style>', 
@@ -31,11 +33,13 @@ program
         'Output pretty indented JSON.', parseInt, 2
     .parse process.argv
 
-inputPath = program.args[0]
-
-inputLocation = inputPath or '/dev/stdin'
-rawInput = fs.readFileSync (fs.path.resolve inputLocation), encoding: 'utf8'
-objects = yaml.safeLoad rawInput
+if program.new
+    objects = [{}]
+else
+    inputPath = program.args[0]
+    inputLocation = inputPath or '/dev/stdin'
+    rawInput = fs.readFileSync (fs.path.resolve inputLocation), encoding: 'utf8'
+    objects = yaml.safeLoad rawInput
 
 unless program.each
     objects = [objects]
