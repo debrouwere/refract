@@ -7,6 +7,7 @@ sure I haven't accidentally broken *everything*.
 fs = require 'fs'
 {exec} = require 'child_process'
 _ = require 'underscore'
+_.str = require 'underscore.string'
 should = require 'should'
 refract = require '../src'
 
@@ -36,10 +37,36 @@ describe 'refract: command-line interface', ->
             --template examples/simple/template.yml \
             --normalized slugify \
             --update \
-            --pretty"
+            --indent"
         exec command, (err, stdout, stderr) ->
             stdout.should.be.an.instanceOf String
             refracted = JSON.parse stdout
             refracted.calculated.total.should.eql original.Subtotal + original.Tax
             refracted.calculated.profit.should.eql refracted.calculated.total * 0.1
+            done err
+
+    it 'can refract an array of objects', (done) ->
+        path = 'examples/many/posts.json'
+        original = JSON.parse fs.readFileSync path, encoding: 'utf8'
+        command = "./bin/refract #{path} \
+            --template examples/many/template.yml \
+            --update \
+            --each \
+            --indent"
+        exec command, (err, stdout, stderr) ->
+            stdout.should.be.an.instanceOf String
+            refracted = JSON.parse stdout
+            refracted.length.should.eql 2
+            for refraction, i in refracted
+                refraction.should.have.keys [
+                    'title'
+                    'language'
+                    'slug'
+                    'permalink'
+                    ]
+
+                language = original[i].language
+                title = original[i].title
+                slug = _.str.slugify title
+                refraction.permalink.should.eql "/#{language}/#{slug}/"
             done err

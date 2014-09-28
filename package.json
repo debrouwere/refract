@@ -1,6 +1,6 @@
 {
   "name": "refract-cli",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A command-line utility to reshape objects. Destructuring assignment on steroids.",
   "main": "lib/index.js",
   "bin": {

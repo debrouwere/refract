@@ -35,7 +35,10 @@ inputPath = program.args[0]
 
 inputLocation = inputPath or '/dev/stdin'
 rawInput = fs.readFileSync (fs.path.resolve inputLocation), encoding: 'utf8'
-object = yaml.safeLoad rawInput
+objects = yaml.safeLoad rawInput
+
+unless program.each
+    objects = [objects]
 
 if program.template
     rawTemplate = fs.readFileSync (fs.path.resolve program.template), encoding: 'utf8'
@@ -57,24 +60,26 @@ if program.helpers
 helpers = _.extend {}, additionalHelpers, refract.defaultHelpers
 
 normalizer = _.str[program.normalized or 'identity']
-normalizedObject = utils.applyToKeys object, normalizer
+normalize = _.partial utils.applyToKeys, _, normalizer
+normalizedObjects = _.map objects, normalize
 
-refractTemplate = _.partial refract, template
+refractions = _.map normalizedObjects, (item) ->
+    context = _.extend {}, item, helpers
+    refract template, context
 
-if program.each
-    refraction = _.map normalizedObject, (item) ->
-        context = _.extend {}, item, helpers
-        refractTemplate context
-else
-    context = _.extend {}, normalizedObject, helpers
-    refraction = refractTemplate context
+if program.missing or program.update
+    if program.missing
+        merge = utils.splat _.defaults
+    else
+        merge = utils.splat _.extend
 
-if program.missing
-    refraction = _.defaults normalizedObject, refraction
-else if program.update
-    refraction = _.extend normalizedObject, refraction
+    pairs = _.zip normalizedObjects, refractions
+    refractions = _.map pairs, merge
 
-serialization = JSON.stringify refraction, undefined, program.indent
+unless program.each
+    refractions = refractions[0]
+
+serialization = JSON.stringify refractions, undefined, program.indent
 
 if program.inPlace
     if not inputPath then throw new Error "Cannot edit in-place on stdin."

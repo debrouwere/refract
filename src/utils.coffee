@@ -1,8 +1,29 @@
 _ = require 'underscore'
+exports.evaluate = evaluate = (require 'coffee-script').eval
+
+exports.string = string = (value) ->
+    '"' + value + '"'
+
+exports.interpolate = (value, options) ->
+    evaluate (string value), options
 
 exports.applyToKeys = applyToKeys = (obj, fn) ->
-    if obj.constructor is Object
-        _.object _.map obj, (value, key) ->
-            [(fn key), (applyToKeys value, fn)]
-    else
-        obj
+    applyFunctionToKeys = _.partial applyToKeys, _, fn
+
+    switch obj.constructor
+        when Object
+            _.object _.map obj, (value, key) ->
+                [(fn key), (applyFunctionToKeys value)]
+        when Array
+            _.map obj, applyFunctionToKeys
+        else
+            obj
+
+exports.kv = (key, value) ->
+    obj = {}
+    obj[key] = value
+    obj
+
+exports.splat = (fn) ->
+    (args) ->
+        fn args...
