@@ -194,7 +194,7 @@ Renaming the fields of an object is easy:
 }
 ```
 
-However, if you'd like _all_ fields of an object to adhere to the same standard, this field-per-field approach gets cumbersome really fast. The `--normalize` option provides a handy shortcut. You can normalize key names using any [underscore.string](https://github.com/epeli/underscore.string) function, e.g. `--normalize underscored`. The most useful ones are probably: 
+However, if you'd like _all_ fields of an object to adhere to the same standard, this field-per-field approach gets cumbersome really fast. The `--normalized` option provides a handy shortcut. You can normalize key names using any [underscore.string](https://github.com/epeli/underscore.string) function, e.g. `--normalized underscored`. The most useful ones are probably: 
 
 * titleize
 * camelize
