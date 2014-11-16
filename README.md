@@ -1,6 +1,6 @@
 # Refract
 
-[![Build Status](https://travis-ci.org/stdbrouw/refract.svg)](https://travis-ci.org/stdbrouw/refract)
+[![Build Status](https://travis-ci.org/debrouwere/refract.svg)](https://travis-ci.org/debrouwere/refract)
 
 Refract is a command-line utility to reshape objects to a template.
 
