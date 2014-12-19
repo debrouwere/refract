@@ -9,10 +9,14 @@
   "scripts": {
     "test": "make test"
   },
-  "author": "Stijn Debrouwere",
+  "author": {
+    "name": "Stijn Debrouwere",
+    "email": "stijn@debrouwere.org", 
+    "url": "http://debrouwere.org"
+  }, 
   "repository": {
     "type" : "git", 
-    "url" : "http://github.com/stdbrouw/refract.git"
+    "url" : "http://github.com/debrouwere/refract.git"
   },   
   "license": "ISC",
   "dependencies": {

@@ -1,0 +1,1 @@
+Order: #{titleize order} (total: #{subtotal + tax})

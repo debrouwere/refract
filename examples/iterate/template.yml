@@ -1,0 +1,7 @@
+client: client
+client_id: dasherize client
+items[]:
+    description: description
+    cost: if cost? then cost else hours * rate
+    subtotal: cost * tax
+total: "(pluck items, 'subtotal').reduce (a, b) -> a + b"

@@ -1,0 +1,14 @@
+{
+    "client": "John's Pies and Pastries", 
+    "rate": 100, 
+    "tax": 0.2, 
+    "items": [
+        {
+            "description": "web development", 
+            "hours": 10
+        }, {
+            "description": "additional support", 
+            "cost": 2500
+        }
+    ]
+}

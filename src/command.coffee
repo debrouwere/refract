@@ -8,6 +8,12 @@ program = require 'commander'
 refract = require './'
 utils = require './utils'
 
+parsers = 
+    json: JSON.parse
+    yml: yaml.safeLoad
+    yaml: yaml.safeLoad
+    txt: _.identity
+
 program
     .option '-t --template <path>', 
         'Path to a template file.'
@@ -38,10 +44,8 @@ if program.new
 else
     inputPath = program.args[0]
     inputLocation = inputPath or '/dev/stdin'
-    if (fs.path.extname inputLocation) is '.json'
-        parse = JSON.parse
-    else
-        parse = yaml.safeLoad
+    inputExt = (fs.path.extname inputLocation)[1..]
+    parse = parsers[inputExt] or parsers.txt
     rawInput = fs.readFileSync (fs.path.resolve inputLocation), encoding: 'utf8'
     objects = parse rawInput
 
@@ -50,7 +54,9 @@ unless program.each
 
 if program.template
     rawTemplate = fs.readFileSync (fs.path.resolve program.template), encoding: 'utf8'
-    template = yaml.safeLoad rawTemplate
+    templateExt = (fs.path.extname program.template)[1..]
+    parse = parsers[templateExt]
+    template = parse rawTemplate
 else if program.string
     template = yaml.safeLoad program.string
 else if program.apply
@@ -91,6 +97,9 @@ unless program.each
     refractions = refractions[0]
 
 serialization = JSON.stringify refractions, undefined, program.indent
+# if the output is a string, we remove outer quotes
+if refractions.constructor is String
+    serialization = serialization.slice 1, -1
 
 if program.inPlace
     if not inputPath then throw new Error "Cannot edit in-place on stdin."

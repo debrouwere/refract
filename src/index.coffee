@@ -17,7 +17,7 @@ we'll turn them into double quotes anyway.
 this doesn't make much sense when refracting and instead
 probably denote some sort of file path, so we'll interpret 
 an expression that starts and ends with a forward slash
-as a strings as well.
+as a string as well.
 
 Note that e.g. `/regexp/.exec 'some string'` and `fn 'a string'`
 will not be requoted, we're only checking the first and last 
@@ -48,9 +48,27 @@ module.exports = (template, context, update) ->
     switch template?.constructor
         when Object
             _.object _.map template, (value, key) ->
-                updateHere = _.partial update, key
-                refracted = refract value, updateHere
-                [key, refracted]
+                # --- a wee bit experimental ---
+                _refract = module.exports
+                if (iterationOptions = key.slice -2) is '[]'
+                    rawKey = key
+                    key = key.slice 0, -2
+                    # won't work if we have to traverse
+                    # multiple levels, of course
+                    refracted = []
+                    for i in _.range context[key].length
+                        subtpl = template[rawKey]
+                        subobj = context[key][i]
+                        _context = _.extend {}, context, subobj
+                        updateHere = _.partial updateAt, _context
+                        _refracted = _refract subtpl, _context, updateHere
+                        refracted.push _refracted
+                    [key, refracted]
+                # ---
+                else
+                    updateHere = _.partial update, key
+                    refracted = refract value, updateHere
+                    [key, refracted]
         when Array
             _.map template, refract
         when String
@@ -66,4 +84,4 @@ module.exports = (template, context, update) ->
             template
 
 
-module.exports.defaultHelpers = _.extend {}, _, _.str
+module.exports.defaultHelpers = _.extend {}, _, _.str, {refract: module:exports}
