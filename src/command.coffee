@@ -29,6 +29,8 @@ program
         'Refract each element in an array.'
     .option '-H --helpers <path>', 
         'Add in additional JavaScript helper functions.'
+    .option '-M --modules <names>', 
+        'Add in additional JavaScript modules as helper functions.'
     .option '-N, --new', 
         'Refract an empty object.'
     .option '-i --in-place', 
@@ -67,11 +69,15 @@ else if program.apply
 else
     throw new Error "Specify a --template, --string string or --apply mapping."
 
+# TODO: allow helpers to be YAML or JSON, not just CoffeeScript or JavaScript
 if program.helpers
     require 'coffee-script/register'
-    additionalHelpers = require fs.path.resolve program.helpers
+    additionalHelpers = program.helpers.split(',').map (helper) ->
+        require fs.path.resolve helper
+else
+    additionalHelpers = []
 
-helpers = _.extend {}, additionalHelpers, refract.defaultHelpers
+helpers = _.extend {}, additionalHelpers..., refract.defaultHelpers
 
 if program.normalized
     normalizer = _.str[program.normalized or 'identity']

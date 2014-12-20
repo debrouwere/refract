@@ -1,7 +1,8 @@
-client: client
-client_id: dasherize client
-items[]:
+client:
+    - client
+    - dasherize client
+payable[items]:
     description: description
     cost: if cost? then cost else hours * rate
-    subtotal: cost * tax
-total: "(pluck items, 'subtotal').reduce (a, b) -> a + b"
+    subtotal: cost * (1 + tax)
+total: "(pluck payable, 'subtotal').reduce (a, b) -> a + b"

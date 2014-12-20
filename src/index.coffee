@@ -1,5 +1,6 @@
 _ = require 'underscore'
 _.str = require 'underscore.string'
+#math = require 'mathjs'
 utils = require './utils'
 {evaluate, interpolate} = utils
 
@@ -35,42 +36,53 @@ requote = (value) ->
     else
         value
 
+extractKeys = (key) ->
+    match = key.match /(\w+)(\[(\w+)(\:(\w+))?\])?/
+    matches = (_.compact match).length
+    if matches > 5
+        [rawKey, key, __, namespace, __, source] = match
+    else
+        [rawKey, key, __, source] = match
+        source ?= key
+        namespace = no
+    {rawKey, key, namespace, source}
+
 updateAt = (obj, segments..., key, value) ->
     for segment in segments
         obj = obj[segment] ?= {}
 
     _.extend obj, (utils.kv key, value)
 
-module.exports = (template, context, update) ->
-    refract = _.partial module.exports, _, context
+module.exports = refract = (template, context, update) ->
     update ?= _.partial updateAt, context
 
     switch template?.constructor
         when Object
             _.object _.map template, (value, key) ->
-                # --- a wee bit experimental ---
-                _refract = module.exports
-                if (iterationOptions = key.slice -2) is '[]'
-                    rawKey = key
-                    key = key.slice 0, -2
-                    # won't work if we have to traverse
-                    # multiple levels, of course
+                if (iterationOptions = key.slice -1) is ']'
+                    {rawKey, key, namespace, source} = extractKeys key
+                    subTemplate = template[rawKey]
+                    # IMPROVE: won't work if we have to traverse
+                    # multiple levels for `source`, of course
                     refracted = []
-                    for i in _.range context[key].length
-                        subtpl = template[rawKey]
-                        subobj = context[key][i]
-                        _context = _.extend {}, context, subobj
-                        updateHere = _.partial updateAt, _context
-                        _refracted = _refract subtpl, _context, updateHere
-                        refracted.push _refracted
+                    for i in _.range context[source].length
+                        subObj = context[source][i]
+                        if namespace
+                            subObj = utils.kv namespace, subObj
+                        subContext = _.extend {}, context, subObj
+                        updateHere = _.partial updateAt, subContext
+                        refracted.push refract subTemplate, subContext, updateHere
+                    update key, refracted
                     [key, refracted]
-                # ---
                 else
                     updateHere = _.partial update, key
-                    refracted = refract value, updateHere
+                    refracted = refract value, context, updateHere
                     [key, refracted]
         when Array
-            _.map template, refract
+            refractValue = _.partial refract, _, context, _.noop
+            refracted = _.map template, refractValue
+            update refracted
+            refracted
         when String
             value = requote template
             try
@@ -84,4 +96,4 @@ module.exports = (template, context, update) ->
             template
 
 
-module.exports.defaultHelpers = _.extend {}, _, _.str, {refract: module:exports}
+module.exports.defaultHelpers = _.extend {refract}, _, _.str
