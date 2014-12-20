@@ -37,12 +37,13 @@ requote = (value) ->
         value
 
 extractKeys = (key) ->
+    rawKey = key
     match = key.match /(\w+)(\[(\w+)(\:(\w+))?\])?/
     matches = (_.compact match).length
     if matches > 5
-        [rawKey, key, __, namespace, __, source] = match
+        [__, key, __, namespace, __, source] = match
     else
-        [rawKey, key, __, source] = match
+        [__, key, __, source] = match
         source ?= key
         namespace = no
     {rawKey, key, namespace, source}
@@ -60,7 +61,8 @@ module.exports = refract = (template, context, update) ->
         when Object
             _.object _.map template, (value, key) ->
                 if (iterationOptions = key.slice -1) is ']'
-                    {rawKey, key, namespace, source} = extractKeys key
+                    rawKey = key
+                    {key, namespace, source} = extractKeys rawKey
                     subTemplate = template[rawKey]
                     # IMPROVE: won't work if we have to traverse
                     # multiple levels for `source`, of course
@@ -70,8 +72,7 @@ module.exports = refract = (template, context, update) ->
                         if namespace
                             subObj = utils.kv namespace, subObj
                         subContext = _.extend {}, context, subObj
-                        updateHere = _.partial updateAt, subContext
-                        refracted.push refract subTemplate, subContext, updateHere
+                        refracted.push refract subTemplate, subContext
                     update key, refracted
                     [key, refracted]
                 else
@@ -94,6 +95,5 @@ module.exports = refract = (template, context, update) ->
             refracted
         else
             template
-
 
 module.exports.defaultHelpers = _.extend {refract}, _, _.str

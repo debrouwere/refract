@@ -62,7 +62,7 @@ else if program.apply
 else
     throw new Error "Specify a --template, --string, --template-string or --apply mapping."
 
-additionalHelpers = (program.helpers or '').split(',').map (path) -> load path, {namespace: yes}
+additionalHelpers = (program.helpers?.split(',') or []).map (path) -> load path, {namespace: yes}
 helpers = _.extend {}, additionalHelpers..., refract.defaultHelpers
 
 if program.normalized
@@ -76,6 +76,8 @@ refractions = _.map normalizedObjects, (item) ->
     context = _.extend {}, item, helpers
     refract template, context
 
+# TODO: consider a more advanced merge which also 
+# goes through (objects in) arrays
 if program.missing or program.update
     if program.missing
         merge = utils.splat _.defaults

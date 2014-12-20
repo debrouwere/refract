@@ -28,7 +28,7 @@ exports.kv = (key, value) ->
 
 exports.splat = (fn) ->
     ->
-        fn arguments...
+        fn arguments[0]...
 
 exports.guard = (fn) ->
     ->

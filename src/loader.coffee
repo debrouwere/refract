@@ -31,7 +31,7 @@ exports.load = (path, options={}) ->
             value = parse fullPath
     else
         parse = parsers[options.type] or parsers.txt
-        raw = fs.readFileSync (fs.path.resolve path), encoding: 'utf8'
+        raw = fs.readFileSync fullPath, encoding: 'utf8'
         value = parse raw
 
     if options.namespace

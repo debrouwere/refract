@@ -1,23 +1,23 @@
 {
   "name": "refract-cli",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A command-line utility to reshape objects. Destructuring assignment on steroids.",
   "main": "lib/index.js",
   "bin": {
     "refract": "bin/refract"
-  }, 
+  },
   "scripts": {
     "test": "make test"
   },
   "author": {
     "name": "Stijn Debrouwere",
-    "email": "stijn@debrouwere.org", 
+    "email": "stijn@debrouwere.org",
     "url": "http://debrouwere.org"
-  }, 
+  },
   "repository": {
-    "type" : "git", 
-    "url" : "http://github.com/debrouwere/refract.git"
-  },   
+    "type": "git",
+    "url": "http://github.com/debrouwere/refract.git"
+  },
   "license": "ISC",
   "dependencies": {
     "coffee-script": "^1.8.0",
@@ -25,9 +25,9 @@
     "js-yaml": "^3.2.2",
     "underscore": "^1.7",
     "underscore.string": "^2.4"
-  }, 
+  },
   "devDependencies": {
-    "should": "4.x", 
-    "mocha": "1.x"
+    "mocha": "^2.0.1",
+    "should": "4.x"
   }
 }
