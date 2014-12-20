@@ -46,9 +46,16 @@ Refract takes data and modifies it according to a template.
 
 Templates are JSON or YAML objects containing keys and expressions. Each expression will be evaluated and the resulting object will be returned.
 
-Refract accepts a path to a YAML or JSON template file (using `--template`), a template string (using `--string`) or a list of mapping functions (using `--apply`).
+There are many ways to specify a template:
 
-`--string` and `--apply` are convenient for quick refractions, where you don't want to bother with having a refraction template on disk.
+| option              | description                            | example
+| ------------------- | -------------------------------------- | -------
+| `--template`        | a path to a YAML or JSON template file | `--template template.yml`
+| `--string`          | a string with interpolations           | `--string 'hello #{name}'`
+| `--template-string` | a template string                      | `--template-string 'head: uppercase title'`
+| `--apply`           | a list of mapping functions            | `--apply title:uppercase`
+
+While `--template` is recommended for most purposes, `--apply` works really well for quick refractions, as do `--string` and `--template-string`. They save you the bother of needing to have a refraction template on disk.
 
 ### --template
 
@@ -58,10 +65,18 @@ refract order.json --template template.json
 
 ### --string
 
-With `--string`, you pass the actual template as a string of YAML of JSON instead of a path to a template file.
+With `--string` you pass a simple string. Output can become dynamic by including placeholders for interpolation.
 
 ```shell
-refract order.json --string 'total: subtotal + tax'
+refract bio.json --string 'Hello #{name}! You are #{age - 20} years over twenty.'
+```
+
+### --template-string
+
+With `--template-string`, you pass the actual template as a string of YAML of JSON instead of a path to a template file.
+
+```shell
+refract order.json --template-string 'total: subtotal + tax'
 ```
 
 ```json

@@ -1,4 +1,6 @@
 _ = require 'underscore'
+
+
 exports.evaluate = evaluate = (require 'coffee-script').eval
 
 exports.string = string = (value) ->
@@ -25,5 +27,9 @@ exports.kv = (key, value) ->
     obj
 
 exports.splat = (fn) ->
-    (args) ->
-        fn args...
+    ->
+        fn arguments...
+
+exports.guard = (fn) ->
+    ->
+        fn arguments[0]
