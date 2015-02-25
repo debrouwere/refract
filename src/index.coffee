@@ -1,5 +1,5 @@
 _ = require 'underscore'
-_.str = require 'underscore.string'
+helpers = require './helpers'
 #math = require 'mathjs'
 utils = require './utils'
 {evaluate, interpolate} = utils

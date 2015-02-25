@@ -12,7 +12,7 @@ exports.interpolate = (value, options) ->
 exports.applyToKeys = applyToKeys = (obj, fn) ->
     applyFunctionToKeys = _.partial applyToKeys, _, fn
 
-    switch obj.constructor
+    switch obj?.constructor
         when Object
             _.object _.map obj, (value, key) ->
                 [(fn key), (applyFunctionToKeys value)]
