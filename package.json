@@ -1,6 +1,6 @@
 {
   "name": "refract-cli",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "A command-line utility to reshape objects. Destructuring assignment on steroids.",
   "main": "lib/index.js",
   "bin": {
@@ -21,10 +21,10 @@
   "license": "ISC",
   "dependencies": {
     "coffee-script": "^1.9.0",
-    "commander": "2.1.x",
-    "js-yaml": "^3.2.2",
-    "underscore": "^1.7",
-    "underscore.string": "^2.4"
+    "commander": "2.6.x",
+    "js-yaml": "^3.2.7",
+    "underscore": "^1.8",
+    "underscore.string": "^3.0"
   },
   "devDependencies": {
     "mocha": "^2.0.1",
